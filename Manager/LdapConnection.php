@@ -13,6 +13,12 @@ class LdapConnection implements LdapConnectionInterface
 
     protected $ress;
 
+    /**
+     * Holds a list of resources per username (username=>resource) to allow for reusing binded connections.
+     * @var array
+     */
+    protected $resources = array();
+
     public function __construct(array $params, Logger $logger)
     {
         $this->params = $params;
@@ -23,17 +29,24 @@ class LdapConnection implements LdapConnectionInterface
     public function search(array $params)
     {
         $this->connect();
+        $param = $this->getParameters();
+        $defaultValue = array(
+            'base_dn' => $param['user'] ['base_dn'],
+            'attrs' => array(),
+            'attrsonly' => 0,
+            'sizelimit' => 0,
+            'timelimit' => 0,
+            'deref' => LDAP_DEREF_NEVER,
+        );
 
         $ref = array(
-            'base_dn' => '',
             'filter' => '',
         );
 
+        $params = array_merge($defaultValue, $params);
         if (count($diff = array_diff_key($ref, $params))) {
             throw new \Exception(sprintf('You must defined %s', print_r($diff, true)));
         }
-
-        $attrs = isset($params['attrs']) ? $params['attrs'] : array();
 
         $this->info(
             sprintf(
@@ -47,8 +60,13 @@ class LdapConnection implements LdapConnectionInterface
             $this->ress,
             $params['base_dn'],
             $params['filter'],
-            $attrs
+            $params['attrs'],
+            $params['attrsonly'],
+            $params['sizelimit'],
+            $params['timelimit'],
+            $params['deref']
         );
+
         $this->checkLdapError();
 
         if ($search) {
@@ -64,7 +82,7 @@ class LdapConnection implements LdapConnectionInterface
 
     /**
      * @return true
-     * @throws \IMAG\LdapBundle\Exceptions\ConnectionException | Connection error
+     * @throws \IMAG\LdapBundle\Exception\ConnectionException | Connection error
      */
     public function bind($user_dn, $password = '', $ress = null)
     {
@@ -128,6 +146,15 @@ class LdapConnection implements LdapConnectionInterface
             ? $this->params['client']['port']
             : '389';
 
+        // check if there is a binded connection for this username, if there is, set $this->ress and return without
+        // doing it again.
+        $username = $this->params['client']['username'];
+        if (isset($this->params['client']['username'])) {
+            if (isset($this->resources[$username])) {
+                $this->ress = $this->resources[$username];
+                return $this;
+            }
+        }
         $ress = @ldap_connect($this->params['client']['host'], $port);
 
         if (isset($this->params['client']['version'])) {
@@ -151,6 +178,8 @@ class LdapConnection implements LdapConnectionInterface
             $this->checkLdapError($ress);
         }
 
+        // store resource per username to be reused later.
+        $this->resources[$username] = $ress;
         $this->ress = $ress;
 
         return $this;
@@ -178,6 +207,11 @@ class LdapConnection implements LdapConnectionInterface
     private function checkLdapError($ress = null)
     {
         if (0 != $code = $this->getErrno($ress)) {
+            if($code == 4){
+                $this->info('LDAP returned an error with code ' . $code . ' : Sizelimit reached');
+                return;
+            }
+
             $message = $this->getError($ress);
             $this->err('LDAP returned an error with code ' . $code . ' : ' . $message);
             throw new ConnectionException($message, $code);
