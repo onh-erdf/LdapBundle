@@ -1,7 +1,7 @@
 {
-    "name": "imag/ldap-bundle",
+    "name": "alborq/LdapBundle",
     "description": "LDAP Bundle for Symfony 2",
-    "homepage": "http://github.com/BorisMorel/LdapBundle",
+    "homepage": "http://github.com/alborq/LdapBundle",
     "license": "CeCILL",
     "authors": [
         {
