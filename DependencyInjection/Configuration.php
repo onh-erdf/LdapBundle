@@ -13,9 +13,16 @@ class Configuration implements ConfigurationInterface
     $rootNode = $treeBuilder->root('imag_ldap');
     $rootNode
         ->children()
-            ->append($this->addClientNode())
-            ->append($this->addUserNode())
-            ->append($this->addRoleNode())
+            ->arrayNode('connection')
+                ->isRequired()
+                ->prototype('array')
+                    ->children()
+                        ->append($this->addClientNode())
+                        ->append($this->addUserNode())
+                        ->append($this->addRoleNode())
+                    ->end()
+                ->end()
+            ->end()
             ->scalarNode('user_class')
               ->defaultValue("IMAG\LdapBundle\User\LdapUser")
             ->end()
@@ -88,5 +95,4 @@ class Configuration implements ConfigurationInterface
 
       return $node;
   }
-
 }
