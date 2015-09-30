@@ -83,28 +83,28 @@ security:
 imag_ldap:
     connection:
         default:
-	  client:
-	    host: your.host.foo
-	    port: 389
-	#    version: 3 # Optional
-	#    username: foo # Optional
-	#    password: bar # Optional
-	#    network_timeout: 10 # Optional
-	#    referrals_enabled: true # Optional
-	#    bind_username_before: true # Optional
-	#    skip_roles: false # Optional
-	
-	  user:
-	    base_dn: ou=people,dc=host,dc=foo
-	#    filter: (&(foo=bar)(ObjectClass=Person)) #Optional
-	    name_attribute: uid
-	  role:
-	    base_dn: ou=group, dc=host, dc=foo
-	#    filter: (ou=group) #Optional
-	    name_attribute: cn
-	    user_attribute: member
-	    user_id: [ dn or username ]
-    	AnotherConnection:
+		  client:
+		    host: your.host.foo
+		    port: 389
+		#    version: 3 # Optional
+		#    username: foo # Optional
+		#    password: bar # Optional
+		#    network_timeout: 10 # Optional
+		#    referrals_enabled: true # Optional
+		#    bind_username_before: true # Optional
+		#    skip_roles: false # Optional
+		
+		  user:
+		    base_dn: ou=people,dc=host,dc=foo
+		#    filter: (&(foo=bar)(ObjectClass=Person)) #Optional
+		    name_attribute: uid
+		  role:
+		    base_dn: ou=group, dc=host, dc=foo
+		#    filter: (ou=group) #Optional
+		    name_attribute: cn
+		    user_attribute: member
+		    user_id: [ dn or username ]
+        AnotherConnection:
     		client: ....
     		And coo ...
     		
