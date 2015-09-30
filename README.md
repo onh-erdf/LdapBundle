@@ -73,35 +73,41 @@ security:
       id: imag_ldap.security.user.provider
                 
   encoders:
-    IMAG\LdapBundle\User\LdapUser: plaintext
+    IMAG\LdapBundle\User\LdapUser:
+        id: imag_ldap.ldap_encoder
 
   access_control:
     - { path: ^/login,          roles: IS_AUTHENTICATED_ANONYMOUSLY }
     - { path: ^/,               roles: IS_AUTHENTICATED_FULLY }
 
 imag_ldap:
-  client:
-    host: your.host.foo
-    port: 389
-#    version: 3 # Optional
-#    username: foo # Optional
-#    password: bar # Optional
-#    network_timeout: 10 # Optional
-#    referrals_enabled: true # Optional
-#    bind_username_before: true # Optional
-#    skip_roles: false # Optional
-
-  user:
-    base_dn: ou=people,dc=host,dc=foo
-#    filter: (&(foo=bar)(ObjectClass=Person)) #Optional
-    name_attribute: uid
-  role:
-    base_dn: ou=group, dc=host, dc=foo
-#    filter: (ou=group) #Optional
-    name_attribute: cn
-    user_attribute: member
-    user_id: [ dn or username ]
-    
+    connection:
+        default:
+	  client:
+	    host: your.host.foo
+	    port: 389
+	#    version: 3 # Optional
+	#    username: foo # Optional
+	#    password: bar # Optional
+	#    network_timeout: 10 # Optional
+	#    referrals_enabled: true # Optional
+	#    bind_username_before: true # Optional
+	#    skip_roles: false # Optional
+	
+	  user:
+	    base_dn: ou=people,dc=host,dc=foo
+	#    filter: (&(foo=bar)(ObjectClass=Person)) #Optional
+	    name_attribute: uid
+	  role:
+	    base_dn: ou=group, dc=host, dc=foo
+	#    filter: (ou=group) #Optional
+	    name_attribute: cn
+	    user_attribute: member
+	    user_id: [ dn or username ]
+    	AnotherConnection:
+    		client: ....
+    		And coo ...
+    		
 #  user_class: IMAG\LdapBundle\User\LdapUser # Optional
 ```
 
