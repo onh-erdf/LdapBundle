@@ -51,6 +51,7 @@ class LdapFactory extends AbstractFactory
         $container
             ->setDefinition($dao, new DefinitionDecorator('security.authentication.provider.dao'))
             ->replaceArgument(0, new Reference($userProviderId))
+            ->replaceArgument(1, new Reference('security.user_checker'))
             ->replaceArgument(2, $id)
         ;
 
